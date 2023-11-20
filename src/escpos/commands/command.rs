@@ -7,9 +7,15 @@ pub enum ESCPOSCommand {
 
 pub struct ESCPOSCommandList(Vec<ESCPOSCommand>);
 
+impl Default for ESCPOSCommandList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ESCPOSCommandList {
     pub fn new() -> Self {
-        ESCPOSCommandList(Vec::new())
+        Self::default()
     }
 
     pub fn add_command(&mut self, command: ESCPOSCommand) {
@@ -21,8 +27,10 @@ impl ESCPOSCommandList {
             self.add_command(command);
         }
     }
+}
 
-    pub fn to_string(&self) -> String {
+impl ToString for ESCPOSCommandList {
+    fn to_string(&self) -> String {
         let mut command_string = String::new();
         for command in &self.0 {
             match command {

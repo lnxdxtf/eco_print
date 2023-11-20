@@ -1,14 +1,14 @@
 use std::error::Error;
 
-use bluest::{Adapter, AdvertisingDevice, Characteristic, Uuid};
+use bluest::{Adapter, AdvertisingDevice, Characteristic, Device, Uuid};
 use futures_lite::StreamExt;
 
 use crate::escpos::commands::command::ESCPOSCommandList;
+
 pub struct PrinterESCPOSBluetooth {
     adapter: Adapter,
     device_name: String,
-    device: Option<AdvertisingDevice>,
-    device_services: Option<Vec<Uuid>>,
+    device: Option<Device>,
     device_writer: Option<Characteristic>,
 }
 
@@ -21,17 +21,18 @@ impl PrinterESCPOSBluetooth {
         Ok(Self {
             adapter,
             device_name,
-            device_services: None,
             device: None,
             device_writer: None,
         })
     }
 
     pub async fn print_text(&mut self, command: ESCPOSCommandList) -> Result<(), Box<dyn Error>> {
+        self.device_writer = Some(self.get_device_writer().await?);
+
         self.device_writer
             .clone()
             .unwrap()
-            .write(command.to_string().as_bytes())
+            .write_without_response(command.to_string().as_bytes())
             .await?;
         Ok(())
     }
@@ -41,11 +42,19 @@ impl PrinterESCPOSBluetooth {
         while self.device.is_none() {
             if let Some(discovered_device) = scan.next().await {
                 if discovered_device.device.name().as_deref().unwrap() == self.device_name {
-                    self.device_services =
-                        Some(self.get_device_services(&discovered_device).await?);
-                    self.device_writer = Some(self.get_device_writer().await?);
-                    self.device = Some(discovered_device);
-                    println!("Connected to: {}", self.device_name);
+                    let services = self.get_device_services(&discovered_device).await?;
+
+                    let device_printer = self
+                        .adapter
+                        .discover_devices(&services)
+                        .await?
+                        .next()
+                        .await
+                        .ok_or("failed to discover device")
+                        .unwrap()
+                        .unwrap();
+
+                    self.device = Some(device_printer);
                 }
             }
         }
@@ -68,16 +77,7 @@ impl PrinterESCPOSBluetooth {
 
     async fn get_device_writer(&self) -> Result<Characteristic, Box<dyn Error>> {
         let mut characteristic_writer: Option<Characteristic> = None;
-        while let Some(service) = self
-            .device
-            .clone()
-            .unwrap()
-            .device
-            .services()
-            .await?
-            .iter()
-            .next()
-        {
+        for service in self.device.clone().unwrap().services().await?.iter() {
             let characteristics = service.characteristics().await?;
             for characteristic in characteristics.iter() {
                 let props = characteristic.properties().await?;

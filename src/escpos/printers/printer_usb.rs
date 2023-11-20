@@ -14,19 +14,15 @@ impl PrinterESCPOSUSB {
         let devices = FinderUSB::devices()?;
         let device = devices
             .iter()
-            .filter_map(|d| match d.device_descriptor() {
-                Ok(descriptor) => Some((d, descriptor)),
-                Err(_) => None,
+            .find_map(|device| {
+                let descriptor = device.device_descriptor().ok()?;
+                (descriptor.vendor_id() == vendor_id).then(|| device.clone())
             })
-            .find(|(_, descriptor)| descriptor.vendor_id() == vendor_id)
-            .map(|(d, _)| d.clone())
             .ok_or("Device not found")?;
-        Ok(device.clone())
+        Ok(device)
     }
 
-    pub fn open_device(
-        device: &Device<GlobalContext>,
-    ) -> Result<DeviceHandle<GlobalContext>, rusb::Error> {
+    pub fn open_device(device: &Device<GlobalContext>) -> Result<DeviceHandle<GlobalContext>, rusb::Error> {
         let mut device_handle = device.open()?;
         device_handle.claim_interface(0)?;
         Ok(device_handle)
@@ -46,7 +42,7 @@ impl PrinterESCPOSUSB {
     pub fn print_text(&mut self, command: ESCPOSCommandList) -> Result<usize, rusb::Error> {
         self.device_handle.write_bulk(
             self.endpoint,
-            &command.to_string().as_bytes(),
+            command.to_string().as_bytes(),
             Duration::from_secs(1),
         )
     }

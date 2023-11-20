@@ -15,7 +15,7 @@ impl Default for ESCPOSCommandList {
 
 impl ESCPOSCommandList {
     pub fn new() -> Self {
-        Self::default()
+        ESCPOSCommandList(Vec::new())
     }
 
     pub fn add_command(&mut self, command: ESCPOSCommand) {

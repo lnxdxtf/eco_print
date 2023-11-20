@@ -21,7 +21,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
         ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
     ]);
-
+    
     let device_printer_bluetooth_name = "KP-1020".to_string();
 
     let mut printer: PrinterESCPOSBluetooth =

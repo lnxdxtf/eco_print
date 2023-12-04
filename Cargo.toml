@@ -9,12 +9,13 @@ edition = "2021"
 bluest = { version = "0.6.6", optional = true }
 rusb = { version = "0.9.3", optional = true }
 futures-lite = { version = "1.13.0", default-features = false, optional = true }
+image = { version = "0.24.7", optional = true }
 
 
 [features]
 default = ["escpos"]
 ender3v2 = []
-escpos = ["rusb", "bluest", "futures-lite"]
+escpos = ["rusb", "bluest", "futures-lite", "image"]
 
 [dev-dependencies]
 tokio = { version = "1.34.0", features = ["full"] }

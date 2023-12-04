@@ -1,4 +1,4 @@
-use super::basic::ESCPOSCommandsBasic;
+use super::{basic::ESCPOSCommandsBasic, image::ESCPOSImage};
 
 pub enum ESCPOSCommand {
     Command(ESCPOSCommandsBasic),

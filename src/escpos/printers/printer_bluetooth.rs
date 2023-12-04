@@ -2,8 +2,9 @@ use std::error::Error;
 
 use bluest::{Adapter, AdvertisingDevice, Characteristic, Device, Uuid};
 use futures_lite::StreamExt;
+use image::EncodableLayout;
 
-use crate::escpos::commands::command::ESCPOSCommandList;
+use crate::escpos::commands::{command::ESCPOSCommandList, image::ESCPOSImage};
 
 pub struct PrinterESCPOSBluetooth {
     adapter: Adapter,
@@ -33,6 +34,17 @@ impl PrinterESCPOSBluetooth {
             .clone()
             .unwrap()
             .write_without_response(command.to_string().as_bytes())
+            .await?;
+        Ok(())
+    }
+
+    pub async fn print_image(&mut self, image: ESCPOSImage) -> Result<(), Box<dyn Error>> {
+        println!("{:?}", image.to_escpos().as_bytes());
+        self.device_writer = Some(self.get_device_writer().await?);
+        self.device_writer
+            .clone()
+            .unwrap()
+            .write_without_response(&image.to_escpos().as_bytes())
             .await?;
         Ok(())
     }

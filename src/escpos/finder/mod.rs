@@ -1,3 +1,6 @@
+pub use tokio;
+pub use uuid;
+
 pub mod usb {
     use rusb::{devices, DeviceList, GlobalContext};
 
@@ -11,6 +14,7 @@ pub mod usb {
 }
 
 pub mod ble {
+    pub use btleplug;
     use std::error::Error;
     use std::time::Duration;
 

@@ -1,9 +1,15 @@
 use std::error::Error;
+use std::str::FromStr;
+use std::time::Duration;
 
 use eco_print::escpos::commands::basic::ESCPOSCommandsBasic;
 use eco_print::escpos::commands::command::{ESCPOSCommand, ESCPOSCommandList};
 use eco_print::escpos::commands::image::ESCPOSImage;
-use eco_print::escpos::printers::printer_bluetooth::PrinterESCPOSBluetooth;
+use eco_print::escpos::finder::ble::FinderBLE;
+use eco_print::escpos::printers::printer_bluetooth::{
+    PrinterESCPOSBluetooth, THERMAL_PRINTER_SERVICE,
+};
+use uuid::Uuid;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -16,26 +22,30 @@ async fn main() -> Result<(), Box<dyn Error>> {
         ESCPOSCommand::Command(ESCPOSCommandsBasic::AlignRight),
         ESCPOSCommand::Text("X".to_string()),
         ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
-        ESCPOSCommand::Text("X".to_string()),
-        ESCPOSCommand::Command(ESCPOSCommandsBasic::AlignRight),
-        ESCPOSCommand::Text("X".to_string()),
-        ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
-        ESCPOSCommand::Text("X".to_string()),
-        ESCPOSCommand::Command(ESCPOSCommandsBasic::AlignRight),
+        ESCPOSCommand::Command(ESCPOSCommandsBasic::AlignCenter),
         ESCPOSCommand::Text("X".to_string()),
         ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
+        ESCPOSCommand::Command(ESCPOSCommandsBasic::AlignLeft),
         ESCPOSCommand::Text("X".to_string()),
+        ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
+        ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
+        ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
         ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
         ESCPOSCommand::Command(ESCPOSCommandsBasic::LineFeed),
     ]);
+    let adapter = FinderBLE::get_adapter().await?;
+    let filter = vec![Uuid::from_str(THERMAL_PRINTER_SERVICE)?];
+    let devices = FinderBLE::scan(&adapter, filter, Duration::from_secs(5)).await?;
+    if devices.is_empty() {
+        println!("No devices found");
+        return Ok(());
+    }
+    println!("{:#?}", devices);
+    let peripheral = FinderBLE::connect(devices[0].clone()).await?;
+    let mut printer = PrinterESCPOSBluetooth::new(peripheral).await?;
 
-    let device_printer_bluetooth_name = "KP-1020".to_string();
-
-    let mut printer: PrinterESCPOSBluetooth =
-        PrinterESCPOSBluetooth::new(device_printer_bluetooth_name).await?;
-    printer.scan_and_connect().await?;
-    // printer.print_text(commands).await?;
-    printer.print_image(img).await?;
+    println!("PRINTING ...");
+    printer.print_text(commands).await?;
 
     Ok(())
 }

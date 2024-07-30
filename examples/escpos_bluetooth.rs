@@ -4,7 +4,6 @@ use std::time::Duration;
 
 use eco_print::escpos::commands::basic::ESCPOSCommandsBasic;
 use eco_print::escpos::commands::command::{ESCPOSCommand, ESCPOSCommandList};
-use eco_print::escpos::commands::image::ESCPOSImage;
 use eco_print::escpos::finder::ble::FinderBLE;
 use eco_print::escpos::printers::printer_bluetooth::{
     PrinterESCPOSBluetooth, THERMAL_PRINTER_SERVICE,
@@ -13,8 +12,6 @@ use uuid::Uuid;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let img_path = "assets/imgs/square.png";
-    let img = ESCPOSImage::new(img_path, 384).unwrap();
 
     let mut commands: ESCPOSCommandList = ESCPOSCommandList::new();
     commands.add_list(vec![

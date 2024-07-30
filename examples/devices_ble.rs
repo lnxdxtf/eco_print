@@ -3,6 +3,7 @@ use std::{error::Error, str::FromStr, time::Duration};
 use eco_print::escpos::{
     finder::ble::FinderBLE, printers::printer_bluetooth::THERMAL_PRINTER_SERVICE,
 };
+
 use uuid::Uuid;
 
 #[tokio::main]
@@ -12,7 +13,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let devices = FinderBLE::scan(&adapter, filter, Duration::from_secs(5)).await?;
     println!("{:#?}", devices);
-    
+
     let device = FinderBLE::connect(devices[0].clone()).await?;
 
     Ok(())

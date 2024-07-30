@@ -1,9 +1,8 @@
-use crate::escpos::commands::{command::ESCPOSCommandList, image::ESCPOSImage};
+use crate::escpos::commands::command::ESCPOSCommandList;
 use btleplug::{
     api::{bleuuid::uuid_from_u16, Central, Characteristic, Manager as _, Peripheral, WriteType},
     platform::{Adapter, Manager},
 };
-use image::EncodableLayout;
 use std::{error::Error, str::FromStr};
 use uuid::Uuid;
 
@@ -47,7 +46,13 @@ impl PrinterESCPOSBluetooth {
         Ok(())
     }
 
-    pub async fn print_image(&mut self, image: ESCPOSImage) -> Result<(), Box<dyn Error>> {
+    #[cfg(feature = "img")]
+    pub async fn print_image(
+        &mut self,
+        image: crate::escpos::commands::command::image::ESCPOSImage,
+    ) -> Result<(), Box<dyn Error>> {
+        use image::EncodableLayout;
+
         let chr = self.get_print_chr()?;
         let data = image.to_escpos();
         println!("{:?}", data);

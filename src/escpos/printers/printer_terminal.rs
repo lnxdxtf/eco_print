@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::escpos::commands::{command::ESCPOSCommandList, image::ESCPOSImage};
+use crate::escpos::commands::command::ESCPOSCommandList;
 
 pub struct PrinterESCPOSBTerminal {}
 
@@ -13,8 +13,9 @@ impl PrinterESCPOSBTerminal {
         println!("{}", command.to_string());
         Ok(())
     }
-
-    pub fn print_image(&self, image: ESCPOSImage) -> Result<(), Box<dyn Error>> {
+    
+    #[cfg(feature = "img")]
+    pub fn print_image(&self, image: crate::escpos::commands::command::image::ESCPOSImage) -> Result<(), Box<dyn Error>> {
         println!("{}", image.to_ascii_art());
         Ok(())
     }

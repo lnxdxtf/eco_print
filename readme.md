@@ -1,8 +1,7 @@
 # eco_print
 
 The eco_print library is a Rust-developed tool designed to facilitate the
-connection and execution of commands in thermal printers and, in the future, in
-the Ender 3 V2 3D printer. With this library, users can connect to thermal
+connection and execution of commands in thermal printers. With this library, users can connect to thermal
 printers via both Bluetooth and USB, offering flexibility and convenience for
 various use cases.
 
@@ -11,7 +10,7 @@ ideal choice for developers and users in this environment. The library was
 created with the goal of integrating with a User Interface (UI), where users can
 connect their device and gain full control over the printer's functionalities.
 
-### [FEATURE] ESCPOS
+# ESCPOS
 
 One of the main highlights of eco_print is its ability to intuitively and simply
 translate ESC/POS commands, making programming for thermal printers more
@@ -26,7 +25,25 @@ accessible.
 
 #### <a href="/examples/">Examples</a>
 
-#### Usage
+
+## Status
+| Feature             | Status |
+| --------            | --|
+| Android             |🚧|
+| IOS                 |❌|
+| Image/QrCode/BitMap |🚧|
+| USB-Windows         |✅|
+| BLE-Windows         |✅|
+| USB-MacOS           |❌|
+| BLE-MacOS           |❌|
+| USB-Linux           |❌|
+| BLE-Linux           |❌|
+
+NOTE: Mobile(IOS/ANDROID) only supports BLE
+
+
+
+## Usage
 
 - USB
 

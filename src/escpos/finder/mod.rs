@@ -1,6 +1,7 @@
 pub use tokio;
 pub use uuid;
 
+#[cfg(feature = "usb")]
 pub mod usb {
     use rusb::{devices, DeviceList, GlobalContext};
 
@@ -13,6 +14,7 @@ pub mod usb {
     }
 }
 
+#[cfg(feature = "ble")]
 pub mod ble {
     pub use btleplug;
     use std::error::Error;

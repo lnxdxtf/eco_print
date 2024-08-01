@@ -1,6 +1,6 @@
-use std::error::Error;
-
+#![cfg(feature = "usb")]
 use eco_print::escpos::finder::usb::FinderUSB;
+use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let devices = FinderUSB::devices()?;

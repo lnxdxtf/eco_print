@@ -9,7 +9,10 @@ pub mod usb {
 
     impl FinderUSB {
         pub fn devices() -> Result<DeviceList<GlobalContext>, rusb::Error> {
-            devices()
+            let devices = devices();
+            #[cfg(feature = "debug")]
+            log::debug("eco_print::FinderUSB::devices() -> devices: {:?}", devices);
+            devices
         }
     }
 }
@@ -28,9 +31,13 @@ pub mod ble {
     pub struct FinderBLE;
     impl FinderBLE {
         pub async fn get_adapter() -> Result<Adapter, Box<dyn Error>> {
+            #[cfg(feature = "debug")]
+            log::debug!("eco_print::FinderBLE::get_adapter() -> start");
             let manager = Manager::new().await?;
             let adapter_list = manager.adapters().await?;
             if adapter_list.is_empty() {
+                #[cfg(feature = "debug")]
+                log::error!("eco_print::FinderBLE::get_adapter() -> No Bluetooth adapters found");
                 return Err("No Bluetooth adapters found".into());
             }
             Ok(adapter_list
@@ -47,10 +54,21 @@ pub mod ble {
             let filter = ScanFilter {
                 services: services_filter,
             };
+            #[cfg(feature = "debug")]
+            log::debug!(
+                "eco_print::FinderBLE::scan() -> start with duration: {:?} and filter: {:?}",
+                time,
+                filter
+            );
             adapter.start_scan(filter).await?;
             sleep(time).await;
 
             let peripherals = adapter.peripherals().await?;
+            #[cfg(feature = "debug")]
+            log::debug!(
+                "eco_print::FinderBLE::scan() -> peripherals found: {:?}",
+                peripherals
+            );
 
             Ok(peripherals)
         }
@@ -58,9 +76,20 @@ pub mod ble {
         pub async fn connect(
             peripheral: btleplug::platform::Peripheral,
         ) -> Result<btleplug::platform::Peripheral, Box<dyn Error>> {
+            #[cfg(feature = "debug")]
+            log::debug!(
+                "eco_print::FinderBLE::connect() -> start with peripheral: {:?}",
+                peripheral
+            );
             let connected = peripheral.is_connected().await?;
+            #[cfg(feature = "debug")]
+            log::debug!(
+                "eco_print::FinderBLE::connect() -> is_connected: {:?}",
+                connected
+            );
             if !connected {
-                println!(
+                #[cfg(feature = "debug")]
+                log::debug!(
                     "Connecting to {:?}",
                     peripheral.properties().await?.unwrap().local_name
                 );

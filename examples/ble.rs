@@ -1,7 +1,7 @@
 use std::{error::Error, str::FromStr, time::Duration};
 
 use eco_print::escpos::{
-    finder::ble::FinderBLE, printers::printer_bluetooth::THERMAL_PRINTER_SERVICE,
+    finder::ble::FinderBLE, printers::printer_ble::THERMAL_PRINTER_SERVICE,
 };
 
 use uuid::Uuid;

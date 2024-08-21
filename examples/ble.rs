@@ -1,20 +1,32 @@
-use std::{error::Error, str::FromStr, time::Duration};
+use std::time::Duration;
 
-use eco_print::escpos::{
-    finder::ble::FinderBLE, printers::printer_ble::THERMAL_PRINTER_SERVICE,
+use eco_print::{
+    ble::ESCPOSPrinterBLE,
+    commands::command::{ESCPOSBuilder, ESCPOSBuilderTrait, ESCPOSCommand, ESCPOSDataBuilder},
+    EcoPrintResult, FinderTrait,
 };
-
-use uuid::Uuid;
+use tokio::time::sleep;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    let adapter = FinderBLE::get_adapter().await?;
-    let filter = vec![Uuid::from_str(THERMAL_PRINTER_SERVICE)?];
+async fn main() -> EcoPrintResult<()> {
+    pretty_env_logger::init();
+    let mut commands: ESCPOSBuilder = ESCPOSBuilder::default();
+    commands.add_commands(vec![
+        ESCPOSDataBuilder::Command(ESCPOSCommand::LineFeed),
+        ESCPOSDataBuilder::Command(ESCPOSCommand::LineFeed),
+        ESCPOSDataBuilder::Command(ESCPOSCommand::LineFeed),
+        ESCPOSDataBuilder::Text("SO UM TESTE PAEEE HEHEEH".into()),
+        ESCPOSDataBuilder::Command(ESCPOSCommand::LineFeed),
+        ESCPOSDataBuilder::Command(ESCPOSCommand::LineFeed),
+        ESCPOSDataBuilder::Command(ESCPOSCommand::LineFeed),
+    ]);
 
-    let devices = FinderBLE::scan(&adapter, filter, Duration::from_secs(5)).await?;
-    println!("{:#?}", devices);
-
-    let device = FinderBLE::connect(devices[0].clone()).await?;
+    let mut printer = ESCPOSPrinterBLE::new()?;
+    printer.start().await?;
+    printer.scan().await?;
+    sleep(Duration::from_secs(5)).await;
+    let devices = printer.get_devices().await;
+    println!("Devices: {:?}", devices);
 
     Ok(())
 }

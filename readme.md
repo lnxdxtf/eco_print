@@ -39,10 +39,4 @@ NOTE: Mobile only supports BLE
 ## Examples:
 
 - <a href="/examples/ble.rs">ble</a>
-- <a href="/examples/escpos_ble.rs">escpos_ble</a>
-- <a href="/examples/usb.rs">usb</a>
-- <a href="/examples/escpos_usb.rs">escpos_usb</a>
-
-## Tauri:
-
 - <a href="https://github.com/lnxdxtf/tauri-plugin-escpos">tauri-plugin-escpos</a>

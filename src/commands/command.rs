@@ -8,6 +8,7 @@ pub trait ESCPOSBuilderTrait {
     fn add_commands(&mut self, _cmds: Vec<ESCPOSDataBuilder>) {}
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum ESCPOSCommand {
     LineFeed,
     FontBold,
@@ -60,6 +61,7 @@ impl ESCPOSBuilderTrait for ESCPOSCommand {
 /// Text(String) - Add Text
 /// Image(path/byte) - Add Image
 /// QrCode(String) - Add QR Code
+#[derive(Debug, Clone)]
 pub enum ESCPOSDataBuilder {
     Command(ESCPOSCommand),
     Text(String),
@@ -77,7 +79,7 @@ pub enum ESCPOSDataBuilder {
 /// builder.add_command(ESCPOSDataBuilder::Text("Hello World".to_string()));
 /// let cmd_escpos = builder.to_escpos();
 /// ```
-#[derive(Default)]
+#[derive(Default, Debug, Clone)]
 pub struct ESCPOSBuilder(Vec<ESCPOSDataBuilder>);
 
 impl ESCPOSBuilderTrait for ESCPOSBuilder {
